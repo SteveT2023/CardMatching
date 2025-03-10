@@ -35,6 +35,48 @@ class _CardMatchingScreenState extends State<CardMatchingScreen> {
     Colors.teal, Colors.teal
   ];
 
+  List<bool> flippedCards = List.filled(16, false);
+  int? firstPickedCard;
+  int? secondPickedCard;
+  List<GlobalKey<FlipCardState>> cardID = List.generate(16, (index) => GlobalKey<FlipCardState>());
+
+  void flipCard(int index) {
+    if (flippedCards[index]) {
+      return;
+    }
+
+    cardID[index].currentState?.toggleCard();
+
+    setState(() {
+      flippedCards[index] = true;
+    });
+
+    if (firstPickedCard == null) {
+      firstPickedCard = index;
+    } else if (secondPickedCard == null) {
+      secondPickedCard = index;
+      checkMatch();
+    }
+  }
+
+  void checkMatch() {
+    if (cardColors[firstPickedCard!] == cardColors[secondPickedCard!]) {
+      firstPickedCard = null;
+      secondPickedCard = null;
+    } else {
+      Future.delayed(Duration(seconds: 1), () {
+        setState(() {
+          flippedCards[firstPickedCard!] = false;
+          flippedCards[secondPickedCard!] = false;
+          cardID[firstPickedCard!].currentState?.toggleCard();
+          cardID[secondPickedCard!].currentState?.toggleCard();
+          firstPickedCard = null;
+          secondPickedCard = null;
+        });
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,21 +96,26 @@ class _CardMatchingScreenState extends State<CardMatchingScreen> {
           ),
           itemCount: 16,
           itemBuilder: (context, index) {
-            return FlipCard(
-              direction: FlipDirection.HORIZONTAL,
-              front: Card(
-                color: Colors.white,
-                child: Center(
-                  child: Icon(Icons.diamond, color: Colors.black),
+            return GestureDetector(
+              onTap: () => flipCard(index),
+              child: FlipCard(
+                key: cardID[index], 
+                flipOnTouch: false, 
+                direction: FlipDirection.HORIZONTAL,
+                front: Card(
+                  color: Colors.white,
+                  child: Center(
+                    child: Icon(Icons.diamond, color: Colors.black),
+                  ),
+                ),
+                back: Card(
+                  color: cardColors[index],
                 ),
               ),
-             back: Card(
-              color: cardColors[index]
-             ),
             );
-          }
-        )
-      )
+          },
+        ),
+      ),
     );
   }
 }
