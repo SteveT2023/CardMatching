@@ -40,6 +40,12 @@ class _CardMatchingScreenState extends State<CardMatchingScreen> {
   int? secondPickedCard;
   List<GlobalKey<FlipCardState>> cardID = List.generate(16, (index) => GlobalKey<FlipCardState>());
 
+  @override
+  void initState() {
+    super.initState();
+    cardColors.shuffle();
+  }
+
   void flipCard(int index) {
     if (flippedCards[index]) {
       return;
@@ -63,6 +69,7 @@ class _CardMatchingScreenState extends State<CardMatchingScreen> {
     if (cardColors[firstPickedCard!] == cardColors[secondPickedCard!]) {
       firstPickedCard = null;
       secondPickedCard = null;
+      checkVictory();
     } else {
       Future.delayed(Duration(seconds: 1), () {
         setState(() {
@@ -77,6 +84,20 @@ class _CardMatchingScreenState extends State<CardMatchingScreen> {
     }
   }
 
+  void checkVictory() {
+    if (flippedCards.every((flipped) => flipped)) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Congratulations!'),
+            content: Text('You Win!'),
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,7 +107,7 @@ class _CardMatchingScreenState extends State<CardMatchingScreen> {
         centerTitle: true,
         backgroundColor: Colors.grey
       ),
-      body: Padding (
+      body: Padding(
         padding: EdgeInsets.all(5),
         child: GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -99,8 +120,8 @@ class _CardMatchingScreenState extends State<CardMatchingScreen> {
             return GestureDetector(
               onTap: () => flipCard(index),
               child: FlipCard(
-                key: cardID[index], 
-                flipOnTouch: false, 
+                key: cardID[index],
+                flipOnTouch: false,
                 direction: FlipDirection.HORIZONTAL,
                 front: Card(
                   color: Colors.white,
