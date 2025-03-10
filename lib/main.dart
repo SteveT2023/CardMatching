@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flip_card/flip_card.dart';
 
 void main() {
   runApp(MyApp());
@@ -48,13 +49,22 @@ class _CardMatchingScreenState extends State<CardMatchingScreen> {
         child: GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 4,
-            crossAxisSpacing: 20,
-            mainAxisSpacing: 30
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 20
           ),
           itemCount: 16,
           itemBuilder: (context, index) {
-            return Card(
-              color: cardColors[index],
+            return FlipCard(
+              direction: FlipDirection.HORIZONTAL,
+              front: Card(
+                color: Colors.white,
+                child: Center(
+                  child: Icon(Icons.diamond, color: Colors.black),
+                ),
+              ),
+             back: Card(
+              color: cardColors[index]
+             ),
             );
           }
         )
